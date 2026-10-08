@@ -11,7 +11,7 @@ import { describe, it, expect, beforeAll, vi } from "vitest";
 
 // Banco novo na memoria a cada rodada, sem sujar a pasta .pglite do dev.
 process.env.PGLITE_DIR = "memory://";
-process.env.NODE_ENV = "test";
+// O vitest ja roda com NODE_ENV=test; so garantimos que nao ha Postgres externo.
 delete process.env.DATABASE_URL;
 
 // O Next nao esta rodando aqui: cookies e revalidacao viram memoria e no-op.
@@ -71,7 +71,7 @@ async function criarObra(): Promise<number> {
 }
 
 describe("primeiro acesso", () => {
-  it("depois de definir a senha, nao pede de novo", async () => {
+  it("depois de definir a senha, não pede de novo", async () => {
     expect(await acoes.precisaDefinirSenha()).toBe(false);
   });
 
@@ -81,8 +81,8 @@ describe("primeiro acesso", () => {
   });
 });
 
-describe("orcamento", () => {
-  it("grava os itens e calcula material e mao de obra separados", async () => {
+describe("orçamento", () => {
+  it("grava os itens e calcula material e mão de obra separados", async () => {
     const id = await criarObra();
     const orc = await consultas.obterOrcamento(id);
 
@@ -122,7 +122,7 @@ describe("orcamento", () => {
     expect(orc!.totais.totalMaoObra).toBe(12_000 + 2000);
   });
 
-  it("nao deixa agendar obra sem data", async () => {
+  it("não deixa agendar obra sem data", async () => {
     const id = await criarObra();
     const r = await acoes.atualizarOrcamento({ id, situacaoObra: "agendada" });
     expect(r.ok).toBe(false);
@@ -146,7 +146,7 @@ describe("orcamento", () => {
 });
 
 describe("pagamento do cliente", () => {
-  it("entrada parcial deixa o orcamento parcial", async () => {
+  it("entrada parcial deixa o orçamento parcial", async () => {
     const id = await criarObra();
     const r = await acoes.registrarPagamento({ orcamentoId: id, valor: "600,00" });
     expect(r.ok).toBe(true);
@@ -157,7 +157,7 @@ describe("pagamento do cliente", () => {
     expect(orc!.totais.statusFinanceiro).toBe("parcial");
   });
 
-  it("receber pagamento aprova o orcamento automaticamente", async () => {
+  it("receber pagamento aprova o orçamento automaticamente", async () => {
     const id = await criarObra();
     expect((await consultas.obterOrcamento(id))!.status).toBe("rascunho");
     await acoes.registrarPagamento({ orcamentoId: id, valor: "100,00" });
@@ -183,7 +183,7 @@ describe("pagamento do cliente", () => {
     expect(orc!.pagamentos[0]!.estornadoEm).not.toBeNull();
   });
 
-  it("nao estorna duas vezes", async () => {
+  it("não estorna duas vezes", async () => {
     const id = await criarObra();
     const p = await acoes.registrarPagamento({ orcamentoId: id, valor: "100,00" });
     if (!p.ok) throw new Error(p.erro);
@@ -193,7 +193,7 @@ describe("pagamento do cliente", () => {
 });
 
 describe("a regra do calheiro, de ponta a ponta", () => {
-  it("sem o cliente pagar, o calheiro nao tem nada a receber", async () => {
+  it("sem o cliente pagar, o calheiro não tem nada a receber", async () => {
     const calheiro = await acoes.salvarCalheiro({ nome: "Sem obra paga" });
     if (!calheiro.ok) throw new Error(calheiro.erro);
 
@@ -210,7 +210,7 @@ describe("a regra do calheiro, de ponta a ponta", () => {
     expect(extrato.saldo.saldo).toBe(0);
   });
 
-  it("cliente paga metade, metade da mao de obra fica a acertar", async () => {
+  it("cliente paga metade, metade da mão de obra fica a acertar", async () => {
     const calheiro = await acoes.salvarCalheiro({ nome: "Metade" });
     if (!calheiro.ok) throw new Error(calheiro.erro);
 
@@ -228,7 +228,7 @@ describe("a regra do calheiro, de ponta a ponta", () => {
     expect(extrato.saldo.saldo).toBe(15_000);
   });
 
-  it("cliente quita, vale e acerto fecham a conta e o caixa registra a saida", async () => {
+  it("cliente quita, vale e acerto fecham a conta e o caixa registra a saída", async () => {
     const calheiro = await acoes.salvarCalheiro({ nome: "Conta fechada" });
     if (!calheiro.ok) throw new Error(calheiro.erro);
 
@@ -273,7 +273,7 @@ describe("a regra do calheiro, de ponta a ponta", () => {
     const dele = saidas.filter((l) => l.calheiroId === calheiro.dados.id);
     expect(dele).toHaveLength(2);
     expect(dele.reduce((s, l) => s + l.valorCentavos, 0)).toBe(30_000);
-    expect(dele.every((l) => l.categoria === "Mao de obra")).toBe(true);
+    expect(dele.every((l) => l.categoria === "Mão de obra")).toBe(true);
   });
 
   it("cancelar o vale devolve o dinheiro ao caixa e volta o saldo dele", async () => {
@@ -299,7 +299,7 @@ describe("a regra do calheiro, de ponta a ponta", () => {
     expect(pagas.some((l) => l.calheiroId === calheiro.dados.id)).toBe(false);
   });
 
-  it("nao cancela o mesmo movimento duas vezes", async () => {
+  it("não cancela o mesmo movimento duas vezes", async () => {
     const calheiro = await acoes.salvarCalheiro({ nome: "Cancela duas" });
     if (!calheiro.ok) throw new Error(calheiro.erro);
     const vale = await acoes.lancarMovimentoCalheiro({
@@ -318,7 +318,7 @@ describe("financeiro", () => {
     const r = await acoes.salvarLancamento({
       tipo: "saida",
       categoria: "Aluguel",
-      descricao: "Aluguel do galpao",
+      descricao: "Aluguel do galpão",
       valor: "2.800,00",
       vencimento: somarDias(hoje(), 5),
     });
@@ -351,11 +351,11 @@ describe("financeiro", () => {
     expect(contas.vencidas.some((c) => c.id === atrasada.dados.id)).toBe(true);
   });
 
-  it("nao paga a mesma conta duas vezes", async () => {
+  it("não paga a mesma conta duas vezes", async () => {
     const r = await acoes.salvarLancamento({
       tipo: "saida",
       categoria: "Outros",
-      descricao: "Conta unica",
+      descricao: "Conta única",
       valor: "50,00",
     });
     if (!r.ok) throw new Error(r.erro);
@@ -363,7 +363,7 @@ describe("financeiro", () => {
     expect((await acoes.pagarConta({ id: r.dados.id })).ok).toBe(false);
   });
 
-  it("caixa fica indefinido ate o dono informar o saldo inicial", async () => {
+  it("caixa fica indefinido até o dono informar o saldo inicial", async () => {
     const antes = await consultas.resumoFinanceiro();
     expect(antes.caixa).toBeNull();
 
@@ -422,8 +422,8 @@ describe("compras", () => {
     expect(daCompra!.categoria).toBe("Chapa galvanizada");
   });
 
-  it("nao recebe a mesma compra duas vezes", async () => {
-    const fornecedor = await acoes.salvarFornecedor({ nome: "Fornecedor unico" });
+  it("não recebe a mesma compra duas vezes", async () => {
+    const fornecedor = await acoes.salvarFornecedor({ nome: "Fornecedor único" });
     if (!fornecedor.ok) throw new Error(fornecedor.erro);
     const compra = await acoes.salvarCompra({
       fornecedorId: fornecedor.dados.id,
@@ -451,7 +451,7 @@ describe("compras", () => {
 });
 
 describe("filtros de listagem", () => {
-  it("filtra por situacao da obra e por status financeiro", async () => {
+  it("filtra por situação da obra e por status financeiro", async () => {
     const aReceber = await consultas.listarOrcamentos({ statusFinanceiro: "aberto" });
     expect(aReceber.every((o) => o.totais.saldo === o.totais.total)).toBe(true);
 
@@ -465,7 +465,7 @@ describe("filtros de listagem", () => {
     expect(achados.every((o) => o.clienteNome.includes("Construtora"))).toBe(true);
   });
 
-  it("orcamento arquivado sai da lista", async () => {
+  it("orçamento arquivado sai da lista", async () => {
     const id = await criarObra();
     expect((await consultas.listarOrcamentos()).some((o) => o.id === id)).toBe(true);
     await acoes.arquivarOrcamento(id);

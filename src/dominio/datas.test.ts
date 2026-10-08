@@ -9,10 +9,13 @@ import {
   estaVencido,
   diasAte,
   descreverPrazo,
+  saudacao,
+  descreverDataLonga,
+  semanaDe,
 } from "./datas";
 
 describe("hoje", () => {
-  it("usa o fuso de Sao Paulo, nao UTC", () => {
+  it("usa o fuso de São Paulo, não UTC", () => {
     // 2026-10-09 00:30 UTC ainda e dia 8 em Sao Paulo (UTC-3).
     expect(hoje(new Date("2026-10-09T00:30:00Z"))).toBe("2026-10-08");
   });
@@ -40,11 +43,11 @@ describe("formatarData", () => {
 });
 
 describe("somarDias", () => {
-  it("soma dentro do mes", () => {
+  it("soma dentro do mês", () => {
     expect(somarDias("2026-10-08", 7)).toBe("2026-10-15");
   });
 
-  it("atravessa o mes", () => {
+  it("atravessa o mês", () => {
     expect(somarDias("2026-10-28", 7)).toBe("2026-11-04");
   });
 
@@ -61,7 +64,7 @@ describe("somarDias", () => {
   });
 });
 
-describe("primeiro e ultimo dia do mes", () => {
+describe("primeiro e último dia do mês", () => {
   it("acha as bordas", () => {
     expect(primeiroDiaDoMes("2026-10-08")).toBe("2026-10-01");
     expect(ultimoDiaDoMes("2026-10-08")).toBe("2026-10-31");
@@ -84,8 +87,36 @@ describe("vencimento", () => {
 
   it("descreve o prazo em palavras", () => {
     expect(descreverPrazo("2026-10-08", "2026-10-08")).toBe("hoje");
-    expect(descreverPrazo("2026-10-09", "2026-10-08")).toBe("amanha");
+    expect(descreverPrazo("2026-10-09", "2026-10-08")).toBe("amanhã");
     expect(descreverPrazo("2026-10-05", "2026-10-08")).toBe("atrasado 3 dias");
     expect(descreverPrazo("2026-10-18", "2026-10-08")).toBe("em 10 dias");
+  });
+});
+
+describe("saudacao", () => {
+  it("muda com a hora de São Paulo", () => {
+    // 12:00 UTC = 09:00 em Sao Paulo
+    expect(saudacao(new Date("2026-10-08T12:00:00Z"))).toBe("Bom dia");
+    // 18:00 UTC = 15:00
+    expect(saudacao(new Date("2026-10-08T18:00:00Z"))).toBe("Boa tarde");
+    // 23:00 UTC = 20:00
+    expect(saudacao(new Date("2026-10-08T23:00:00Z"))).toBe("Boa noite");
+  });
+});
+
+describe("descreverDataLonga", () => {
+  it("escreve a data por extenso sem o -feira", () => {
+    expect(descreverDataLonga("2026-10-08")).toBe("Quinta, 8 de outubro de 2026");
+  });
+});
+
+describe("semanaDe", () => {
+  it("pega de segunda a domingo", () => {
+    // 2026-10-08 e quinta-feira.
+    expect(semanaDe("2026-10-08")).toEqual({ inicio: "2026-10-05", fim: "2026-10-11" });
+  });
+
+  it("domingo pertence a semana que começou na segunda anterior", () => {
+    expect(semanaDe("2026-10-11")).toEqual({ inicio: "2026-10-05", fim: "2026-10-11" });
   });
 });

@@ -13,7 +13,7 @@ describe("senha", () => {
     expect(conferirSenha("", hash)).toBe(false);
   });
 
-  it("nao guarda a senha em texto", () => {
+  it("não guarda a senha em texto", () => {
     const hash = gerarHashSenha("minha-senha-secreta");
     expect(hash).not.toContain("minha-senha-secreta");
   });
@@ -29,7 +29,7 @@ describe("senha", () => {
     }
   });
 
-  it("nao se confunde com acento escrito de outra forma", () => {
+  it("não se confunde com acento escrito de outra forma", () => {
     // "José" pode vir com o acento junto ou separado, dependendo do teclado.
     const hash = gerarHashSenha("José123");
     expect(conferirSenha("José123", hash)).toBe(true);

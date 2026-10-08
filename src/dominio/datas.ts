@@ -68,12 +68,54 @@ export function diasAte(data: string, referencia: string = hoje()): number {
   return Math.round(ms / 86_400_000);
 }
 
-/** Texto amigavel: "hoje", "amanha", "atrasado 3 dias". */
+/** Texto amigavel: "hoje", "amanhã", "atrasado 3 dias". */
 export function descreverPrazo(data: string, referencia: string = hoje()): string {
   const dias = diasAte(data, referencia);
   if (dias === 0) return "hoje";
-  if (dias === 1) return "amanha";
+  if (dias === 1) return "amanhã";
   if (dias === -1) return "atrasado 1 dia";
   if (dias < 0) return `atrasado ${-dias} dias`;
   return `em ${dias} dias`;
+}
+
+/** Hora do dia em Sao Paulo (0 a 23), para saber se e manha ou tarde. */
+export function horaDoDia(agora: Date = new Date()): number {
+  const texto = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: FUSO,
+    hour: "2-digit",
+    hour12: false,
+  }).format(agora);
+  return Number(texto.replace(/\D/g, ""));
+}
+
+export function saudacao(agora: Date = new Date()): string {
+  const hora = horaDoDia(agora);
+  if (hora < 12) return "Bom dia";
+  if (hora < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+/** "2026-10-08" -> "Quarta, 8 de outubro de 2026" */
+export function descreverDataLonga(data: string = hoje()): string {
+  const texto = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(`${data}T12:00:00Z`));
+
+  // O pt-BR devolve "quarta-feira, 8 de outubro de 2026". Fica mais curto
+  // sem o "-feira", e com a primeira letra maiuscula.
+  const semFeira = texto.replace("-feira", "");
+  return semFeira.charAt(0).toUpperCase() + semFeira.slice(1);
+}
+
+/** Intervalo da semana corrente (segunda a domingo) de uma data. */
+export function semanaDe(data: string = hoje()): { inicio: string; fim: string } {
+  const d = new Date(`${data}T12:00:00Z`);
+  const diaSemana = d.getUTCDay(); // 0 = domingo
+  const recuo = diaSemana === 0 ? 6 : diaSemana - 1;
+  const inicio = somarDias(data, -recuo);
+  return { inicio, fim: somarDias(inicio, 6) };
 }

@@ -2,7 +2,7 @@
  * Dados de EXEMPLO, para o sistema nao abrir vazio e dar para navegar.
  *
  * Os nomes, enderecos e precos sao inventados. Os precos NAO sao pesquisa de
- * mercado: ajuste tudo na tela "Tabela de precos" antes de usar de verdade.
+ * mercado: ajuste tudo na tela "Tabela de preços" antes de usar de verdade.
  *
  *   npm run db:seed              insere o exemplo
  *   npm run db:seed -- --limpar  apaga tudo e insere de novo
@@ -38,8 +38,8 @@ async function principal() {
     await banco.execute(sql`
       TRUNCATE TABLE
         movimentos_calheiro, lancamentos, pagamentos, orcamento_itens,
-        orcamentos, compra_itens, compras, lista_compras, historico,
-        tipos_calha, clientes, fornecedores, calheiros, configuracoes
+        orçamentos, compra_itens, compras, lista_compras, histórico,
+        tipos_calha, clientes, fornecedores, calheiros, configurações
       RESTART IDENTITY CASCADE
     `);
     console.log("Dados apagados.");
@@ -48,7 +48,7 @@ async function principal() {
   const jaTem = await banco.select().from(tiposCalha).limit(1);
   if (jaTem.length > 0) {
     console.log(
-      "O banco ja tem dados. Para refazer o exemplo: npm run db:seed -- --limpar",
+      "O banco já tem dados. Para refazer o exemplo: npm run db:seed -- --limpar",
     );
     await fecharBanco();
     return;
@@ -68,7 +68,7 @@ async function principal() {
     saldoInicialData: somarDias(d, -60),
   });
 
-  // Tabela de precos: material e mao de obra separados, por metro ou por peca.
+  // Tabela de preços: material e mao de obra separados, por metro ou por peca.
   const tipos = await banco
     .insert(tiposCalha)
     .values([
@@ -83,8 +83,8 @@ async function principal() {
       { nome: "Condutor redondo 100mm", unidade: "m", precoMaterialCentavos: 3400, precoMaoObraCentavos: 1000, ordem: 9 },
       { nome: "Bocal", unidade: "un", precoMaterialCentavos: 3500, precoMaoObraCentavos: 1000, ordem: 10 },
       { nome: "Cabeceira", unidade: "un", precoMaterialCentavos: 2800, precoMaoObraCentavos: 800, ordem: 11 },
-      { nome: "Bracadeira", unidade: "un", precoMaterialCentavos: 1200, precoMaoObraCentavos: 500, ordem: 12 },
-      { nome: "Chapeu chines", unidade: "un", precoMaterialCentavos: 4500, precoMaoObraCentavos: 1200, ordem: 13 },
+      { nome: "Braçadeira", unidade: "un", precoMaterialCentavos: 1200, precoMaoObraCentavos: 500, ordem: 12 },
+      { nome: "Chapéu chinês", unidade: "un", precoMaterialCentavos: 4500, precoMaoObraCentavos: 1200, ordem: 13 },
       { nome: "Tela protetora de calha", unidade: "m", precoMaterialCentavos: 2500, precoMaoObraCentavos: 900, ordem: 14 },
       { nome: "Coifa de churrasqueira", unidade: "un", precoMaterialCentavos: 38_000, precoMaoObraCentavos: 8000, ordem: 15 },
     ])
@@ -101,20 +101,20 @@ async function principal() {
   const fornecedoresInseridos = await banco
     .insert(fornecedores)
     .values([
-      { nome: "Metalurgica Sul Chapas", nomeFantasia: "Sul Chapas", categoria: "Chapa galvanizada", telefone: "(00) 3000-0001" },
+      { nome: "Metalúrgica Sul Chapas", nomeFantasia: "Sul Chapas", categoria: "Chapa galvanizada", telefone: "(00) 3000-0001" },
       { nome: "Distribuidora de Tubos Central", nomeFantasia: "Tubos Central", categoria: "Condutor/tubo", telefone: "(00) 3000-0002" },
       { nome: "Casa do Rebite", categoria: "Rebites/parafusos/buchas", telefone: "(00) 3000-0003" },
-      { nome: "Vedacoes e Silicones ABC", categoria: "Silicone/vedacao", telefone: "(00) 3000-0004" },
-      { nome: "Posto Boa Viagem", categoria: "Combustivel" },
+      { nome: "Vedações e Silicones ABC", categoria: "Silicone/vedação", telefone: "(00) 3000-0004" },
+      { nome: "Posto Boa Viagem", categoria: "Combustível" },
     ])
     .returning();
 
   const clientesInseridos = await banco
     .insert(clientes)
     .values([
-      { nome: "Construtora Horizonte", telefone: "(00) 91111-1111", cidade: "Sao Paulo", bairro: "Vila Industrial", endereco: "Rua das Oficinas, 120" },
-      { nome: "Maria Aparecida Lopes", telefone: "(00) 92222-2222", cidade: "Sao Paulo", bairro: "Jardim Sao Luiz", endereco: "Rua Pintassilgo, 45" },
-      { nome: "Condominio Res. Pedra Branca", telefone: "(00) 93333-3333", cidade: "Guarulhos", endereco: "Av. Central, 900" },
+      { nome: "Construtora Horizonte", telefone: "(00) 91111-1111", cidade: "São Paulo", bairro: "Vila Industrial", endereco: "Rua das Oficinas, 120" },
+      { nome: "Maria Aparecida Lopes", telefone: "(00) 92222-2222", cidade: "São Paulo", bairro: "Jardim São Luiz", endereco: "Rua Pintassilgo, 45" },
+      { nome: "Condomínio Res. Pedra Branca", telefone: "(00) 93333-3333", cidade: "Guarulhos", endereco: "Av. Central, 900" },
     ])
     .returning();
 
@@ -129,8 +129,8 @@ async function principal() {
       status: "aprovado",
       situacaoObra: "feita",
       calheiroId: calheirosInseridos[0]!.id,
-      enderecoObra: "Rua das Oficinas, 120 - galpao 2",
-      observacoes: "Troca completa da calha do galpao.",
+      enderecoObra: "Rua das Oficinas, 120 - galpão 2",
+      observacoes: "Troca completa da calha do galpão.",
     })
     .returning();
 
@@ -198,7 +198,7 @@ async function principal() {
   await banco.insert(orcamentoItens).values([
     { orcamentoId: orc3!.id, ordem: 1, tipoCalhaId: tipo("Calha platibanda").id, descricao: "Calha platibanda", unidade: "m", quantidadeMilesimos: 46_000, precoMaterialCentavos: 5800, precoMaoObraCentavos: 2000 },
     { orcamentoId: orc3!.id, ordem: 2, tipoCalhaId: tipo("Tela protetora de calha").id, descricao: "Tela protetora de calha", unidade: "m", quantidadeMilesimos: 46_000, precoMaterialCentavos: 2500, precoMaoObraCentavos: 900 },
-    { orcamentoId: orc3!.id, ordem: 3, tipoCalhaId: tipo("Chapeu chines").id, descricao: "Chapeu chines", unidade: "un", quantidadeMilesimos: 6000, precoMaterialCentavos: 4500, precoMaoObraCentavos: 1200 },
+    { orcamentoId: orc3!.id, ordem: 3, tipoCalhaId: tipo("Chapéu chinês").id, descricao: "Chapéu chinês", unidade: "un", quantidadeMilesimos: 6000, precoMaterialCentavos: 4500, precoMaoObraCentavos: 1200 },
   ]);
 
   // --- Compra de materia-prima e conta a pagar ---------------------------
@@ -220,9 +220,9 @@ async function principal() {
 
   await banco.insert(lancamentos).values([
     { tipo: "saida", categoria: "Chapa galvanizada", descricao: "Bobinas - Sul Chapas", valorCentavos: 487_000, vencimento: somarDias(d, 5), status: "aberto", fornecedorId: fornecedoresInseridos[0]!.id, compraId: compra1!.id },
-    { tipo: "saida", categoria: "Combustivel", descricao: "Diesel da caminhonete", valorCentavos: 32_000, vencimento: somarDias(d, -3), dataPagamento: somarDias(d, -3), forma: "dinheiro", status: "pago", fornecedorId: fornecedoresInseridos[4]!.id },
+    { tipo: "saida", categoria: "Combustível", descricao: "Diesel da caminhonete", valorCentavos: 32_000, vencimento: somarDias(d, -3), dataPagamento: somarDias(d, -3), forma: "dinheiro", status: "pago", fornecedorId: fornecedoresInseridos[4]!.id },
     { tipo: "saida", categoria: "Rebites/parafusos/buchas", descricao: "Rebites e buchas", valorCentavos: 18_500, vencimento: somarDias(d, -2), status: "aberto", fornecedorId: fornecedoresInseridos[2]!.id },
-    { tipo: "saida", categoria: "Aluguel", descricao: "Aluguel do galpao", valorCentavos: 280_000, vencimento: somarDias(d, 8), status: "aberto" },
+    { tipo: "saida", categoria: "Aluguel", descricao: "Aluguel do galpão", valorCentavos: 280_000, vencimento: somarDias(d, 8), status: "aberto" },
   ]);
 
   await banco.insert(listaCompras).values([
@@ -232,13 +232,13 @@ async function principal() {
   ]);
 
   console.log("Exemplo inserido:");
-  console.log("  - 15 tipos de calha na tabela de precos");
+  console.log("  - 15 tipos de calha na tabela de preços");
   console.log("  - 3 clientes, 5 fornecedores, 2 calheiros");
-  console.log("  - 3 orcamentos (um quitado, um com entrada, um enviado)");
+  console.log("  - 3 orçamentos (um quitado, um com entrada, um enviado)");
   console.log("  - 1 compra recebida e 4 contas a pagar");
   console.log("");
-  console.log("ATENCAO: nomes e precos sao inventados, so para voce navegar.");
-  console.log("Ajuste os precos em Tabela de precos antes de usar de verdade.");
+  console.log("ATENÇÃO: nomes e preços são inventados, só para você navegar.");
+  console.log("Ajuste os preços em Tabela de preços antes de usar de verdade.");
   console.log("Para zerar tudo: npm run db:seed -- --limpar");
 
   await fecharBanco();

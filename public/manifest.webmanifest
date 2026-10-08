@@ -1,0 +1,23 @@
+{
+  "name": "Calhas Andrade",
+  "short_name": "Calhas",
+  "description": "Gestao da fabrica: orcamentos, obras, financeiro e compras.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f7f8",
+  "theme_color": "#15171c",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Novo orcamento", "short_name": "Orcamento", "url": "/orcamentos/novo" },
+    { "name": "Financeiro", "short_name": "Financeiro", "url": "/financeiro" }
+  ]
+}

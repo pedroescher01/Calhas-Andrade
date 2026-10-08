@@ -14,6 +14,7 @@ import {
   orcamentos,
   pagamentos,
   tiposCalha,
+  usuario,
   type Calheiro,
   type Cliente,
   type Configuracoes,
@@ -48,6 +49,15 @@ export async function obterConfiguracoes(): Promise<Configuracoes> {
 
   const [criada] = await banco.insert(configuracoes).values({ id: 1 }).returning();
   return criada!;
+}
+
+/** Nome do dono, para a saudacao do painel. */
+export async function obterNomeDono(): Promise<string | null> {
+  const banco = obterBanco();
+  const linhas = await banco.select({ nome: usuario.nome }).from(usuario).limit(1);
+  const nome = linhas[0]?.nome?.trim();
+  // "Dono" e o nome generico do primeiro acesso: nao vale como saudacao.
+  return !nome || nome === "Dono" ? null : nome;
 }
 
 // ---------------------------------------------------------------------------
@@ -422,7 +432,7 @@ export async function extratoCalheiro(calheiroId: number): Promise<{
       linhas.push({
         data: obra.dataEmissao,
         tipo: "mao_de_obra",
-        descricao: `Mao de obra liberada - ${obra.clienteNome}`,
+        descricao: `Mão de obra liberada - ${obra.clienteNome}`,
         orcamentoId: obra.id,
         valorCentavos: obra.totais.maoObraLiberada,
         movimentoId: null,

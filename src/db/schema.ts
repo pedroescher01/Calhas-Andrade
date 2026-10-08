@@ -69,13 +69,13 @@ export const tipoMovimentoCalheiroEnum = pgEnum("tipo_movimento_calheiro", [
 export const categoriaFornecedorEnum = pgEnum("categoria_fornecedor", [
   "Chapa galvanizada",
   "Condutor/tubo",
-  "Bocais e acessorios",
-  "Silicone/vedacao",
+  "Bocais e acessórios",
+  "Silicone/vedação",
   "Rebites/parafusos/buchas",
   "Estanho/solda",
   "Ferramentas",
-  "Combustivel",
-  "Servicos",
+  "Combustível",
+  "Serviços",
   "Outros",
 ]);
 
@@ -158,7 +158,7 @@ export const clientes = pgTable(
 );
 
 /**
- * Tabela de precos: cada tipo de calha tem preco de MATERIAL e preco de
+ * Tabela de preços: cada tipo de calha tem preco de MATERIAL e preco de
  * MAO DE OBRA, separados, por unidade (normalmente o metro linear).
  * Essa separacao e o que permite acertar a mao de obra com o calheiro
  * quando o cliente paga.

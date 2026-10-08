@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+/*
+ * Paleta tirada do desenho que o dono aprovou: quase-preto no texto, cinza
+ * para o secundario, vermelho da marca nas acoes, verde para pago e ambar
+ * para o que precisa de atencao.
+ *
+ * Verde e vermelho tambem diferem em claridade, nao so em matiz, para quem
+ * nao distingue bem as duas cores ainda enxergar a diferenca.
+ */
+@theme {
+  --font-sans: var(--fonte-barlow), system-ui, sans-serif;
+  --font-condensada: var(--fonte-barlow-condensada), var(--fonte-barlow), sans-serif;
+
+  --color-tinta: #15171c;
+  --color-tinta-media: #2b2f38;
+  --color-cinza: #5a606d;
+  --color-cinza-claro: #8a8f9b;
+
+  --color-linha: #e3e5e9;
+  --color-linha-forte: #d5d8de;
+
+  --color-fundo: #f6f7f8;
+  --color-superficie: #f1f2f4;
+  --color-cartao: #ffffff;
+
+  --color-marca: #b91c1c;
+  --color-marca-escura: #991b1b;
+  --color-marca-fundo: #fbefef;
+
+  --color-pago: #157a3e;
+  --color-pago-escura: #166534;
+  --color-pago-fundo: #ddf3e4;
+
+  --color-aviso: #8a4b08;
+  --color-aviso-fundo: #fdebd3;
+
+  --color-info: #1e4a9c;
+  --color-info-fundo: #dce8fb;
+}
+
+html {
+  background: var(--color-fundo);
+  /* O iPhone sozinho aumenta a fonte no modo paisagem; isso desliga. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  color: var(--color-tinta);
+  background: var(--color-fundo);
+  /* Barra de baixo do celular nao pode cobrir conteudo. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Numeros de dinheiro alinhados em coluna: todo digito com a mesma largura. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/*
+ * Campos de formulario no celular: 16px e o minimo que impede o Safari de
+ * dar zoom sozinho quando o dedo toca no campo, o que tira a tela do lugar
+ * no meio de um orcamento.
+ */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Foco visivel de teclado, sem borda feia no clique de mouse. */
+:focus-visible {
+  outline: 2px solid var(--color-tinta);
+  outline-offset: 2px;
+}
+
+/* Area de toque: nada clicavel menor que o dedo. */
+button,
+a[role="button"],
+[type="button"],
+[type="submit"] {
+  min-height: 44px;
+}
+
+@media print {
+  .nao-imprime {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  @page {
+    margin: 14mm;
+  }
+}

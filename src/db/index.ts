@@ -13,7 +13,7 @@ import * as schema from "./schema";
  * Postgres dentro do proprio processo com PGlite, numa pasta .pglite.
  *
  * E Postgres nos dois casos, mesmo SQL, mesmas migracoes. Nao existe o
- * classico "funciona na minha maquina e quebra no servidor" por diferenca
+ * classico "funciona na minha máquina e quebra no servidor" por diferenca
  * de banco.
  */
 

@@ -25,7 +25,13 @@ import { parsearReais, parsearQuantidade, aplicarBp } from "@/dominio/dinheiro";
 import { hoje, somarDias } from "@/dominio/datas";
 import { calcularTotais } from "@/dominio/orcamento";
 import { gerarHashSenha, conferirSenha } from "./senha";
-import { abrirSessao, encerrarSessao, lerSessao } from "./sessao";
+import {
+  abrirSessao,
+  encerrarSessao,
+  lerSessao,
+  sessaoConfigurada,
+  AVISO_SESSION_SECRET,
+} from "./sessao";
 import { certo, errado, type Resultado } from "./tipos";
 
 /**
@@ -39,7 +45,7 @@ import { certo, errado, type Resultado } from "./tipos";
 
 async function exigirSessao(): Promise<number> {
   const sessao = await lerSessao();
-  if (!sessao) throw new Error("Sessao expirada. Entre de novo.");
+  if (!sessao) throw new Error("Sessão expirada. Entre de novo.");
   return sessao.uid;
 }
 
@@ -71,7 +77,7 @@ const textoOpcional = z
 
 const dataTexto = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Data invalida (use AAAA-MM-DD)");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida (use AAAA-MM-DD)");
 
 // ---------------------------------------------------------------------------
 // Acesso
@@ -85,10 +91,12 @@ export async function precisaDefinirSenha(): Promise<boolean> {
 }
 
 export async function definirSenhaInicial(senha: string): Promise<Resultado> {
+  if (!sessaoConfigurada()) return errado(AVISO_SESSION_SECRET);
+
   const banco = obterBanco();
   const existentes = await banco.select({ id: usuario.id }).from(usuario).limit(1);
   if (existentes.length > 0) {
-    return errado("Ja existe uma senha definida.");
+    return errado("Já existe uma senha definida.");
   }
   if (senha.length < 6) {
     return errado("A senha precisa ter pelo menos 6 caracteres.");
@@ -105,6 +113,8 @@ export async function definirSenhaInicial(senha: string): Promise<Resultado> {
 }
 
 export async function entrar(senha: string): Promise<Resultado> {
+  if (!sessaoConfigurada()) return errado(AVISO_SESSION_SECRET);
+
   const banco = obterBanco();
   const linhas = await banco.select().from(usuario).limit(1);
   const dono = linhas[0];
@@ -132,8 +142,8 @@ export async function trocarSenha(
   const banco = obterBanco();
   const linhas = await banco.select().from(usuario).limit(1);
   const dono = linhas[0];
-  if (!dono) return errado("Usuario nao encontrado.");
-  if (!conferirSenha(atual, dono.senhaHash)) return errado("A senha atual esta errada.");
+  if (!dono) return errado("Usuário não encontrado.");
+  if (!conferirSenha(atual, dono.senhaHash)) return errado("A senha atual está errada.");
 
   await banco
     .update(usuario)
@@ -180,7 +190,7 @@ export async function criarOrcamento(
 
   const analise = novoOrcamento.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const dados = analise.data;
 
@@ -269,7 +279,7 @@ export async function atualizarOrcamento(
 
   const analise = edicaoOrcamento.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const { id, desconto, acrescimoNota, ...campos } = analise.data;
 
@@ -312,7 +322,7 @@ export async function salvarItens(
 
   const analise = z.array(itemEntrada).safeParse(itens);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Item invalido.");
+    return errado(analise.error.issues[0]?.message ?? "Item inválido.");
   }
 
   const banco = obterBanco();
@@ -393,7 +403,7 @@ export async function registrarPagamento(
 
   const analise = novoPagamento.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const dados = analise.data;
   const valorCentavos = parsearReais(dados.valor);
@@ -406,7 +416,7 @@ export async function registrarPagamento(
     .from(orcamentos)
     .where(eq(orcamentos.id, dados.orcamentoId))
     .limit(1);
-  if (!existe[0]) return errado("Orcamento nao encontrado.");
+  if (!existe[0]) return errado("Orçamento não encontrado.");
 
   const [criado] = await banco
     .insert(pagamentos)
@@ -443,8 +453,8 @@ export async function estornarPagamento(id: number): Promise<Resultado> {
 
   const linhas = await banco.select().from(pagamentos).where(eq(pagamentos.id, id)).limit(1);
   const pagamento = linhas[0];
-  if (!pagamento) return errado("Pagamento nao encontrado.");
-  if (pagamento.estornadoEm) return errado("Este pagamento ja foi estornado.");
+  if (!pagamento) return errado("Pagamento não encontrado.");
+  if (pagamento.estornadoEm) return errado("Este pagamento já foi estornado.");
 
   await banco
     .update(pagamentos)
@@ -481,7 +491,7 @@ export async function salvarCliente(
   await exigirSessao();
   const analise = dadosCliente.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const { id, ...campos } = analise.data;
   const banco = obterBanco();
@@ -519,13 +529,13 @@ const dadosFornecedor = z.object({
   categoria: z.enum([
     "Chapa galvanizada",
     "Condutor/tubo",
-    "Bocais e acessorios",
-    "Silicone/vedacao",
+    "Bocais e acessórios",
+    "Silicone/vedação",
     "Rebites/parafusos/buchas",
     "Estanho/solda",
     "Ferramentas",
-    "Combustivel",
-    "Servicos",
+    "Combustível",
+    "Serviços",
     "Outros",
   ]).default("Outros"),
   observacao: textoOpcional,
@@ -538,7 +548,7 @@ export async function salvarFornecedor(
   await exigirSessao();
   const analise = dadosFornecedor.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const { id, ...campos } = analise.data;
   const banco = obterBanco();
@@ -570,7 +580,7 @@ export async function salvarTipoCalha(
   await exigirSessao();
   const analise = dadosTipoCalha.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const { id, precoMaterial, precoMaoObra, ...campos } = analise.data;
   const valores = {
@@ -606,7 +616,7 @@ export async function salvarCalheiro(
   await exigirSessao();
   const analise = dadosCalheiro.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const { id, ...campos } = analise.data;
   const banco = obterBanco();
@@ -652,7 +662,7 @@ export async function lancarMovimentoCalheiro(
 
   const analise = movimentoCalheiro.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const dados = analise.data;
   const valorCentavos = parsearReais(dados.valor);
@@ -660,7 +670,7 @@ export async function lancarMovimentoCalheiro(
   if (dados.tipo !== "ajuste" && valorCentavos <= 0) {
     return errado("O valor precisa ser maior que zero.");
   }
-  if (valorCentavos === 0) return errado("O valor nao pode ser zero.");
+  if (valorCentavos === 0) return errado("O valor não pode ser zero.");
 
   const banco = obterBanco();
   const achados = await banco
@@ -669,7 +679,7 @@ export async function lancarMovimentoCalheiro(
     .where(eq(calheiros.id, dados.calheiroId))
     .limit(1);
   const calheiro = achados[0];
-  if (!calheiro) return errado("Calheiro nao encontrado.");
+  if (!calheiro) return errado("Calheiro não encontrado.");
 
   const data = dados.data ?? hoje();
   const rotulo =
@@ -685,7 +695,7 @@ export async function lancarMovimentoCalheiro(
         .insert(lancamentos)
         .values({
           tipo: "saida",
-          categoria: "Mao de obra",
+          categoria: "Mão de obra",
           descricao,
           valorCentavos,
           vencimento: data,
@@ -731,8 +741,8 @@ export async function cancelarMovimentoCalheiro(id: number): Promise<Resultado> 
     .where(eq(movimentosCalheiro.id, id))
     .limit(1);
   const movimento = linhas[0];
-  if (!movimento) return errado("Movimento nao encontrado.");
-  if (movimento.canceladoEm) return errado("Este movimento ja foi cancelado.");
+  if (!movimento) return errado("Movimento não encontrado.");
+  if (movimento.canceladoEm) return errado("Este movimento já foi cancelado.");
 
   await banco.transaction(async (tx) => {
     await tx
@@ -762,7 +772,7 @@ const dadosLancamento = z.object({
   id: z.coerce.number().int().positive().optional(),
   tipo: z.enum(["entrada", "saida"]),
   categoria: z.string().trim().min(1).max(100).default("Outros"),
-  descricao: z.string().trim().min(2, "Escreva a descricao").max(300),
+  descricao: z.string().trim().min(2, "Escreva a descrição").max(300),
   valor: z.string().trim().min(1, "Informe o valor"),
   vencimento: dataTexto.optional(),
   dataPagamento: dataTexto.nullish(),
@@ -781,7 +791,7 @@ export async function salvarLancamento(
 
   const analise = dadosLancamento.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const { id, valor, jaPago, ...campos } = analise.data;
   const valorCentavos = parsearReais(valor);
@@ -826,8 +836,8 @@ export async function pagarConta(entrada: {
     .where(eq(lancamentos.id, entrada.id))
     .limit(1);
   const conta = linhas[0];
-  if (!conta) return errado("Conta nao encontrada.");
-  if (conta.status === "pago") return errado("Esta conta ja esta paga.");
+  if (!conta) return errado("Conta não encontrada.");
+  if (conta.status === "pago") return errado("Esta conta já está paga.");
   if (conta.status === "cancelado") return errado("Esta conta foi cancelada.");
 
   await banco
@@ -916,7 +926,7 @@ export async function salvarConfiguracoes(
 
   const analise = dadosConfiguracoes.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const { percentualNota, ...campos } = analise.data;
 
@@ -965,7 +975,7 @@ export async function salvarCompra(
 
   const analise = dadosCompra.safeParse(entrada);
   if (!analise.success) {
-    return errado(analise.error.issues[0]?.message ?? "Dados invalidos.");
+    return errado(analise.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const dados = analise.data;
   const banco = obterBanco();
@@ -1028,8 +1038,8 @@ export async function receberCompra(entrada: {
     .where(eq(compras.id, entrada.compraId))
     .limit(1);
   const compra = linhas[0];
-  if (!compra) return errado("Compra nao encontrada.");
-  if (compra.status === "recebido") return errado("Esta compra ja foi recebida.");
+  if (!compra) return errado("Compra não encontrada.");
+  if (compra.status === "recebido") return errado("Esta compra já foi recebida.");
 
   const itens = await banco
     .select()
@@ -1064,7 +1074,7 @@ export async function receberCompra(entrada: {
       await tx.insert(lancamentos).values({
         tipo: "saida",
         categoria: fornecedor[0]?.categoria ?? "Outros",
-        descricao: `Compra #${entrada.compraId} - ${fornecedor[0]?.nome ?? "fornecedor"}`,
+        descricao: `Compra nº ${entrada.compraId} · ${fornecedor[0]?.nome ?? "fornecedor"}`,
         valorCentavos: total,
         vencimento: entrada.vencimento ?? somarDias(hoje(), 30),
         status: "aberto",
@@ -1092,7 +1102,7 @@ export async function adicionarItemLista(entrada: {
   await exigirSessao();
 
   const descricao = entrada.descricao?.trim();
-  if (!descricao) return errado("Escreva o que esta faltando.");
+  if (!descricao) return errado("Escreva o que está faltando.");
 
   const banco = obterBanco();
   const [criado] = await banco

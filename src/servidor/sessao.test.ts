@@ -21,7 +21,7 @@ async function tokenValido(uid: number, exp: number): Promise<string> {
 const umaHoraAFrente = Date.now() + 3_600_000;
 
 describe("lerToken", () => {
-  it("aceita token valido", async () => {
+  it("aceita token válido", async () => {
     const conteudo = lerToken(await tokenValido(1, umaHoraAFrente));
     expect(conteudo?.uid).toBe(1);
   });

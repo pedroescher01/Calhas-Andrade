@@ -143,7 +143,7 @@ describe("formatarReais", () => {
 });
 
 describe("formatarQuantidade", () => {
-  it("nao mostra zeros a direita", () => {
+  it("não mostra zeros a direita", () => {
     expect(formatarQuantidade(3000)).toBe("3");
     expect(formatarQuantidade(12500)).toBe("12,5");
     expect(formatarQuantidade(250)).toBe("0,25");

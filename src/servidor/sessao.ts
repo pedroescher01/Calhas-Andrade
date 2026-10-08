@@ -12,18 +12,33 @@ import { cookies } from "next/headers";
 const NOME_COOKIE = "calhas_sessao";
 const DIAS_VALIDADE = 30;
 
+const SEGREDO_DE_DESENVOLVIMENTO = "segredo-de-desenvolvimento-nao-use-em-producao";
+
+/**
+ * Em producao o segredo da sessao tem que vir do ambiente. Sem ele, qualquer
+ * um que saiba como o cookie e montado entraria no sistema.
+ *
+ * Esta funcao so RESPONDE se esta configurado -- quem pergunta decide o que
+ * fazer. Lancar erro aqui dentro fazia a tela de login nao reagir ao clique,
+ * com a explicacao escondida no log do servidor: o jeito mais certo de
+ * alguem desistir do sistema achando que esta quebrado.
+ */
+export function sessaoConfigurada(): boolean {
+  const doAmbiente = process.env.SESSION_SECRET;
+  if (doAmbiente && doAmbiente.length >= 16) return true;
+  return process.env.NODE_ENV !== "production";
+}
+
+export const AVISO_SESSION_SECRET =
+  "O servidor está sem a variável SESSION_SECRET (mínimo 16 caracteres). " +
+  "Sem ela o sistema não consegue manter você conectado com segurança.";
+
 function segredo(): string {
   const doAmbiente = process.env.SESSION_SECRET;
   if (doAmbiente && doAmbiente.length >= 16) return doAmbiente;
-
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "Falta a variavel SESSION_SECRET (minimo 16 caracteres). " +
-        "Gere uma com: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"",
-    );
-  }
-  // Somente em desenvolvimento, para nao travar quem acabou de clonar.
-  return "segredo-de-desenvolvimento-nao-use-em-producao";
+  // Fora de producao, segue com um segredo fixo para nao travar quem
+  // acabou de clonar o projeto.
+  return SEGREDO_DE_DESENVOLVIMENTO;
 }
 
 function assinar(dados: string): string {
@@ -82,6 +97,7 @@ export async function abrirSessao(usuarioId: number): Promise<void> {
 }
 
 export async function lerSessao(): Promise<Conteudo | null> {
+  if (!sessaoConfigurada()) return null;
   const loja = await cookies();
   return lerToken(loja.get(NOME_COOKIE)?.value);
 }

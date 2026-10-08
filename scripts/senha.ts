@@ -16,7 +16,7 @@ async function principal() {
   if (!nova) {
     console.log(
       existentes.length > 0
-        ? `Senha ja definida para "${existentes[0]!.nome}". Para trocar: npm run senha -- "nova senha"`
+        ? `Senha já definida para "${existentes[0]!.nome}". Para trocar: npm run senha -- "nova senha"`
         : 'Nenhuma senha definida. Rode: npm run senha -- "minha senha"',
     );
     await fecharBanco();

@@ -1,5 +1,5 @@
 {
-  "id": "d375978a-ead1-4173-aa6d-fdea483226a1",
+  "id": "53290b9d-61a8-4df6-bf93-a1b29cf28459",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1559,13 +1559,13 @@
       "values": [
         "Chapa galvanizada",
         "Condutor/tubo",
-        "Bocais e acessorios",
-        "Silicone/vedacao",
+        "Bocais e acessórios",
+        "Silicone/vedação",
         "Rebites/parafusos/buchas",
         "Estanho/solda",
         "Ferramentas",
-        "Combustivel",
-        "Servicos",
+        "Combustível",
+        "Serviços",
         "Outros"
       ]
     },

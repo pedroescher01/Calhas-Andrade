@@ -48,7 +48,7 @@ describe("calcularSaldoCalheiro", () => {
     expect(s.saldo).toBe(-5000);
   });
 
-  it("movimento cancelado nao conta", () => {
+  it("movimento cancelado não conta", () => {
     const s = calcularSaldoCalheiro({
       obras: [{ orcamentoId: 1, totalMaoObra: 30_000, maoObraLiberada: 30_000 }],
       movimentos: [
@@ -74,7 +74,7 @@ describe("calcularSaldoCalheiro", () => {
     expect(s.saldo).toBe(16_000);
   });
 
-  it("ajuste serve para corrigir a conta na mao", () => {
+  it("ajuste serve para corrigir a conta na mão", () => {
     const s = calcularSaldoCalheiro({
       obras: [{ orcamentoId: 1, totalMaoObra: 30_000, maoObraLiberada: 30_000 }],
       movimentos: [{ tipo: "ajuste", valorCentavos: -5000 }],

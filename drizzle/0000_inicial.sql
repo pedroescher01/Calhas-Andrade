@@ -1,4 +1,4 @@
-CREATE TYPE "public"."categoria_fornecedor" AS ENUM('Chapa galvanizada', 'Condutor/tubo', 'Bocais e acessorios', 'Silicone/vedacao', 'Rebites/parafusos/buchas', 'Estanho/solda', 'Ferramentas', 'Combustivel', 'Servicos', 'Outros');--> statement-breakpoint
+CREATE TYPE "public"."categoria_fornecedor" AS ENUM('Chapa galvanizada', 'Condutor/tubo', 'Bocais e acessórios', 'Silicone/vedação', 'Rebites/parafusos/buchas', 'Estanho/solda', 'Ferramentas', 'Combustível', 'Serviços', 'Outros');--> statement-breakpoint
 CREATE TYPE "public"."forma_pagamento" AS ENUM('pix', 'dinheiro', 'transferencia', 'cartao', 'boleto', 'cheque', 'outro');--> statement-breakpoint
 CREATE TYPE "public"."situacao_obra" AS ENUM('a_fazer', 'agendada', 'feita');--> statement-breakpoint
 CREATE TYPE "public"."status_compra" AS ENUM('rascunho', 'pedido', 'recebido', 'cancelado');--> statement-breakpoint

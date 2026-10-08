@@ -152,7 +152,7 @@ export default async function PaginaExtratoCalheiro({
           )}
         </Cartao>
         <p className="mt-2 px-1 text-[13px] text-cinza">
-          Verde e o que ele passou a ter direito. Escuro e o que já saiu do
+          Verde é o que ele passou a ter direito. Escuro é o que já saiu do
           caixa para ele.
         </p>
       </section>

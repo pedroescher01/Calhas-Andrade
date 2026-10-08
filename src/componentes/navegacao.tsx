@@ -122,7 +122,7 @@ export function MenuComputador({ nomeEmpresa }: { nomeEmpresa: string }) {
       <div className="sticky top-0 flex h-dvh flex-col">
         <div className="px-5 py-5">
           <p className="font-condensada text-[12px] font-bold uppercase tracking-[0.2em] text-marca">
-            Gestao
+            Gestão
           </p>
           <p className="mt-0.5 text-[17px] font-bold leading-tight text-tinta">
             {nomeEmpresa}

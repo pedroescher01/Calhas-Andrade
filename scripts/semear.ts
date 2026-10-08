@@ -38,8 +38,8 @@ async function principal() {
     await banco.execute(sql`
       TRUNCATE TABLE
         movimentos_calheiro, lancamentos, pagamentos, orcamento_itens,
-        orçamentos, compra_itens, compras, lista_compras, histórico,
-        tipos_calha, clientes, fornecedores, calheiros, configurações
+        orcamentos, compra_itens, compras, lista_compras, historico,
+        tipos_calha, clientes, fornecedores, calheiros, configuracoes
       RESTART IDENTITY CASCADE
     `);
     console.log("Dados apagados.");
@@ -150,7 +150,7 @@ async function principal() {
   // acertada com o Jonas.
   await banco.insert(movimentosCalheiro).values([
     { calheiroId: calheirosInseridos[0]!.id, tipo: "vale", valorCentavos: 30_000, data: somarDias(d, -15), descricao: "Vale da semana", forma: "dinheiro" },
-    { calheiroId: calheirosInseridos[0]!.id, tipo: "acerto", valorCentavos: 40_000, data: somarDias(d, -4), orcamentoId: orc1!.id, descricao: "Acerto da obra do galpao", forma: "pix" },
+    { calheiroId: calheirosInseridos[0]!.id, tipo: "acerto", valorCentavos: 40_000, data: somarDias(d, -4), orcamentoId: orc1!.id, descricao: "Acerto da obra do galpão", forma: "pix" },
   ]);
 
   // --- Orcamento 2: aprovado, obra agendada, entrada paga ----------------

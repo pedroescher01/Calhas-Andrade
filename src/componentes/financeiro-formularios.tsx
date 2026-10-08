@@ -89,7 +89,7 @@ export function BotaoNovoLancamento({
   return (
     <>
       <Botao variante="principal" onClick={() => setAberta(true)}>
-        Lancar conta
+        Lançar conta
       </Botao>
 
       <Folha titulo="Novo lancamento" aberta={aberta} onFechar={() => setAberta(false)}>

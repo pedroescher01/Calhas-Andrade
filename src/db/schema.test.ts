@@ -62,3 +62,54 @@ describe("rotulos que o dono le", () => {
     }
   });
 });
+
+describe("script de dados de exemplo", () => {
+  /**
+   * O "npm run db:seed -- --limpar" apaga tudo com um TRUNCATE escrito a
+   * mao. Como o nome das tabelas aparece ali como texto, ele e o lugar mais
+   * facil de ficar para tras quando o schema muda -- e foi o que aconteceu:
+   * uma passada de acentuacao renomeou as tabelas no TRUNCATE e o comando
+   * passou a falhar.
+   */
+  it("o TRUNCATE lista tabelas que existem de verdade", async () => {
+    const { readFileSync } = await import("node:fs");
+    const script = readFileSync("scripts/semear.ts", "utf8");
+
+    const trecho = script.match(/TRUNCATE TABLE([\s\S]*?)RESTART IDENTITY/);
+    expect(trecho, "nao achei o TRUNCATE no script de exemplo").not.toBeNull();
+
+    const citadas = trecho![1]!
+      .split(",")
+      .map((n) => n.trim())
+      .filter(Boolean);
+
+    const existentes = new Set(
+      tabelas.map(([, tabela]) => getTableConfig(tabela).name),
+    );
+
+    expect(citadas.length).toBeGreaterThan(10);
+    for (const nome of citadas) {
+      expect(existentes.has(nome), `tabela "${nome}" nao existe no schema`).toBe(true);
+    }
+  });
+
+  it("apaga todas as tabelas que guardam movimento", () => {
+    const { readFileSync } = require("node:fs") as typeof import("node:fs");
+    const script = readFileSync("scripts/semear.ts", "utf8");
+    const trecho = script.match(/TRUNCATE TABLE([\s\S]*?)RESTART IDENTITY/)![1]!;
+
+    // Estas nao podem sobrar para tras: seriam dados velhos misturados
+    // com o exemplo novo.
+    for (const nome of [
+      "orcamentos",
+      "orcamento_itens",
+      "pagamentos",
+      "movimentos_calheiro",
+      "lancamentos",
+      "compras",
+      "compra_itens",
+    ]) {
+      expect(trecho, `o TRUNCATE esqueceu de "${nome}"`).toContain(nome);
+    }
+  });
+});

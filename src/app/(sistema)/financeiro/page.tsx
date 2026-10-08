@@ -218,7 +218,7 @@ export default async function PaginaFinanceiro({
                     </p>
                   </div>
                   <Etiqueta tom={m.tipo === "entrada" ? "pago" : "neutro"}>
-                    {m.tipo === "entrada" ? "entrada" : "saida"}
+                    {m.tipo === "entrada" ? "entrada" : "saída"}
                   </Etiqueta>
                   <Dinheiro
                     centavos={m.valorCentavos}

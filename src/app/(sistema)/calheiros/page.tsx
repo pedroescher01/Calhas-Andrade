@@ -30,7 +30,7 @@ export default async function PaginaCalheiros() {
 
       <Cartao className="bg-superficie p-4">
         <p className="text-[14px] text-cinza">
-          A conta de cada calheiro e calculada sozinha: a mão de obra das obras
+          A conta de cada calheiro é calculada sozinha: a mão de obra das obras
           dele entra conforme o cliente paga. O que você adianta em vale sai
           daqui e do caixa na hora.
         </p>

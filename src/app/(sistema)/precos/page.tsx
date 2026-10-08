@@ -15,7 +15,7 @@ export default async function PaginaPrecos() {
         <div>
           <h1 className="text-2xl font-bold text-tinta md:text-3xl">Tabela de preços</h1>
           <p className="text-[14px] text-cinza">
-            {tipos.length} tipo(s). O preco do orcamento vem daqui.
+            {tipos.length} tipo(s). O preço do orçamento vem daqui.
           </p>
         </div>
         <BotaoNovoTipo />

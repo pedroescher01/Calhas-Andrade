@@ -67,7 +67,7 @@ export default async function PaginaClientes({
                       {c.cidade ? ` - ${c.cidade}` : ""}
                     </p>
                     <p className="text-[13px] text-cinza">
-                      {c.qtdOrcamentos} orcamento(s) - {formatarReais(c.totalFaturado)}
+                      {c.qtdOrcamentos} orçamento(s) · {formatarReais(c.totalFaturado)}
                     </p>
                   </div>
                   {c.saldoDevedor > 0 ? (
